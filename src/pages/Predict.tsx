@@ -1,15 +1,48 @@
 import React, { useState, useEffect } from "react";
 import { ChevronDown, Brain, TrendingUp, Users, BookOpen, GraduationCap, Calculator } from "lucide-react";
 
+interface StudentData {
+  marital_status: string;
+  nationality: string;
+  gender: string;
+  daytime_evening_attendance: string;
+  tuition_fees_up_to_date: string;
+  scholarship_holder: string;
+  previous_qualification_grouped: string;
+  mother_qualification_grouped: string;
+  father_qualification_grouped: string;
+  mother_occupation_grouped: string;
+  father_occupation_grouped: string;
+  application_mode_grouped: string;
+  course_grouped: string;
+  application_order: string;
+  previous_qualification_grade: string;
+  admission_grade: string;
+  age_at_enrollment: string;
+  curricular_units_1st_sem_enrolled: string;
+  curricular_units_1st_sem_approved: string;
+  curricular_units_1st_sem_grade: string;
+  curricular_units_2nd_sem_enrolled: string;
+  curricular_units_2nd_sem_evaluations: string;
+  curricular_units_2nd_sem_approved: string;
+  curricular_units_2nd_sem_grade: string;
+  gdp: string;
+  debtor: string;
+  displaced: string;
+}
 
-const AnimationWrapper = ({ 
-  children, 
-  direction = "up", 
-  delay = 0 
-}: { 
-  children: React.ReactNode; 
-  direction?: "up" | "down" | "left" | "right"; 
-  delay?: number; 
+interface PredictProps {
+  prefilledData: StudentData | null;
+}
+
+const AnimationWrapper = ({
+  children,
+  direction = "up",
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  direction?: "up" | "down" | "left" | "right";
+  delay?: number;
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -24,11 +57,16 @@ const AnimationWrapper = ({
   const getTransformClass = () => {
     if (!isVisible) {
       switch (direction) {
-        case "up": return "translate-y-12 opacity-0";
-        case "down": return "-translate-y-12 opacity-0";
-        case "left": return "translate-x-12 opacity-0";
-        case "right": return "-translate-x-12 opacity-0";
-        default: return "translate-y-12 opacity-0";
+        case "up":
+          return "translate-y-12 opacity-0";
+        case "down":
+          return "-translate-y-12 opacity-0";
+        case "left":
+          return "translate-x-12 opacity-0";
+        case "right":
+          return "-translate-x-12 opacity-0";
+        default:
+          return "translate-y-12 opacity-0";
       }
     }
     return "translate-y-0 translate-x-0 opacity-100";
@@ -41,19 +79,20 @@ const AnimationWrapper = ({
   );
 };
 
-// Card Component with Enhanced Hover Effects
-const Card = ({ 
-  title, 
-  description, 
-  icon: Icon 
-}: { 
-  title: string; 
-  description: string; 
-  icon: React.ComponentType<any>; 
+const Card = ({
+  title,
+  description,
+  icon: Icon,
+}: {
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string; size?: string | number }>;
 }) => (
-  <div className="bg-white rounded-lg shadow-lg p-6 transform transition-all duration-300 
-    hover:scale-105 hover:shadow-2xl hover:bg-gradient-to-br hover:from-green-50 hover:to-green-100
-    relative overflow-hidden group">
+  <div
+    className="bg-white rounded-lg shadow-lg p-6 transform transition-all duration-300 
+      hover:scale-105 hover:shadow-2xl hover:bg-gradient-to-br hover:from-green-50 hover:to-green-100
+      relative overflow-hidden group"
+  >
     <div className="absolute inset-0 bg-green-400 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
     <h3 className="text-xl font-semibold text-green-800 flex items-center mb-4 relative z-10">
       <Icon className="mr-2 text-green-600 transform transition-transform duration-300 group-hover:scale-110" size={24} />
@@ -63,41 +102,53 @@ const Card = ({
   </div>
 );
 
-const Predict: React.FC = () => {
+const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
-  
-  const [formData, setFormData] = useState({
-    marital_status: 'single',
-    nationality: 'Portuguese',
-    gender: '0',
-    daytime_evening_attendance: '0',
-    tuition_fees_up_to_date: '1',
-    scholarship_holder: '0',
-    previous_qualification_grouped: '1',
-    mother_qualification_grouped: '1',
-    father_qualification_grouped: '1',
-    mother_occupation_grouped: 'Skilled',
-    father_occupation_grouped: 'Skilled',
-    application_mode_grouped: 'General Contingent',
-    course_grouped: 'Health',
-    application_order: '1',
-    previous_qualification_grade: '',
-    admission_grade: '',
-    age_at_enrollment: '',
-    curricular_units_1st_sem_enrolled: '6',
-    curricular_units_1st_sem_approved: '0',
-    curricular_units_1st_sem_grade: '',
-    curricular_units_2nd_sem_enrolled: '6',
-    curricular_units_2nd_sem_evaluations: '0',
-    curricular_units_2nd_sem_approved: '0',
-    curricular_units_2nd_sem_grade: '',
-    gdp: '',
-    debtor: '0',
-    displaced: '0',
+
+  const [formData, setFormData] = useState<StudentData>({
+    marital_status: "single",
+    nationality: "Portuguese",
+    gender: "0",
+    daytime_evening_attendance: "0",
+    tuition_fees_up_to_date: "1",
+    scholarship_holder: "0",
+    previous_qualification_grouped: "1",
+    mother_qualification_grouped: "1",
+    father_qualification_grouped: "1",
+    mother_occupation_grouped: "Skilled",
+    father_occupation_grouped: "Skilled",
+    application_mode_grouped: "General Contingent",
+    course_grouped: "Health",
+    application_order: "1",
+    previous_qualification_grade: "",
+    admission_grade: "",
+    age_at_enrollment: "",
+    curricular_units_1st_sem_enrolled: "6",
+    curricular_units_1st_sem_approved: "0",
+    curricular_units_1st_sem_grade: "",
+    curricular_units_2nd_sem_enrolled: "6",
+    curricular_units_2nd_sem_evaluations: "0",
+    curricular_units_2nd_sem_approved: "0",
+    curricular_units_2nd_sem_grade: "",
+    gdp: "",
+    debtor: "0",
+    displaced: "0",
   });
+
+  // Update formData when prefilledData changes
+  useEffect(() => {
+    if (prefilledData) {
+      setFormData(prefilledData);
+      // Scroll to form section when data is prefilled
+      const formSection = document.getElementById("form-section");
+      if (formSection) {
+        formSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [prefilledData]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -109,7 +160,7 @@ const Predict: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -124,14 +175,13 @@ const Predict: React.FC = () => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    
     try {
       // Simulated API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      alert('Prediction completed successfully!');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      alert("Prediction completed successfully!");
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred during prediction.');
+      console.error("Error:", error);
+      alert("An error occurred during prediction.");
     } finally {
       setIsSubmitting(false);
     }
@@ -139,12 +189,12 @@ const Predict: React.FC = () => {
 
   const handleNext = () => {
     setSlideDirection("left");
-    setCurrentStep(prev => Math.min(formSteps.length - 1, prev + 1));
+    setCurrentStep((prev) => Math.min(formSteps.length - 1, prev + 1));
   };
 
   const handlePrevious = () => {
     setSlideDirection("right");
-    setCurrentStep(prev => Math.max(0, prev - 1));
+    setCurrentStep((prev) => Math.max(0, prev - 1));
   };
 
   const formSteps = [
@@ -153,80 +203,130 @@ const Predict: React.FC = () => {
       icon: Users,
       description: "Basic demographic information",
       fields: [
-        { label: "Marital Status", name: "marital_status", type: "select", options: [
-          { value: "single", label: "Single" },
-          { value: "married_union", label: "Married/Union" },
-          { value: "divorced_sep", label: "Divorced/Separated" },
-          { value: "widower", label: "Widower" }
-        ]},
-        { label: "Nationality", name: "nationality", type: "select", options: [
-          { value: "Portuguese", label: "Portuguese" },
-          { value: "Other", label: "Other" }
-        ]},
-        { label: "Gender", name: "gender", type: "select", options: [
-          { value: "0", label: "Female" },
-          { value: "1", label: "Male" }
-        ]},
-        { label: "Age at Enrollment", name: "age_at_enrollment", type: "text" }
-      ]
+        {
+          label: "Marital Status",
+          name: "marital_status",
+          type: "select",
+          options: [
+            { value: "single", label: "Single" },
+            { value: "married_union", label: "Married/Union" },
+            { value: "divorced_sep", label: "Divorced/Separated" },
+            { value: "widower", label: "Widower" },
+          ],
+        },
+        {
+          label: "Nationality",
+          name: "nationality",
+          type: "select",
+          options: [
+            { value: "Portuguese", label: "Portuguese" },
+            { value: "Other", label: "Other" },
+          ],
+        },
+        {
+          label: "Gender",
+          name: "gender",
+          type: "select",
+          options: [
+            { value: "0", label: "Female" },
+            { value: "1", label: "Male" },
+          ],
+        },
+        { label: "Age at Enrollment", name: "age_at_enrollment", type: "text" },
+      ],
     },
     {
       title: "Academic Background",
       icon: BookOpen,
       description: "Educational history and qualifications",
       fields: [
-        { label: "Course Category", name: "course_grouped", type: "select", options: [
-          { value: "Health", label: "Health" },
-          { value: "Social", label: "Social" },
-          { value: "Management", label: "Management" },
-          { value: "Technical", label: "Technical" }
-        ]},
-        { label: "Application Mode", name: "application_mode_grouped", type: "select", options: [
-          { value: "General Contingent", label: "General Contingent" },
-          { value: "Over 23", label: "Over 23" },
-          { value: "Transfer/Change", label: "Transfer/Change" },
-          { value: "Specialization", label: "Specialization" },
-          { value: "International", label: "International" }
-        ]},
-        { label: "Previous Qualification", name: "previous_qualification_grouped", type: "select", options: [
-          { value: "0", label: "Basic Education" },
-          { value: "1", label: "Secondary Education" },
-          { value: "2", label: "Higher Education" }
-        ]},
+        {
+          label: "Course Category",
+          name: "course_grouped",
+          type: "select",
+          options: [
+            { value: "Health", label: "Health" },
+            { value: "Social", label: "Social" },
+            { value: "Management", label: "Management" },
+            { value: "Technical", label: "Technical" },
+          ],
+        },
+        {
+          label: "Application Mode",
+          name: "application_mode_grouped",
+          type: "select",
+          options: [
+            { value: "General Contingent", label: "General Contingent" },
+            { value: "Over 23", label: "Over 23" },
+            { value: "Transfer/Change", label: "Transfer/Change" },
+            { value: "Specialization", label: "Specialization" },
+            { value: "International", label: "International" },
+          ],
+        },
+        {
+          label: "Previous Qualification",
+          name: "previous_qualification_grouped",
+          type: "select",
+          options: [
+            { value: "0", label: "Basic Education" },
+            { value: "1", label: "Secondary Education" },
+            { value: "2", label: "Higher Education" },
+          ],
+        },
         { label: "Previous Qualification Grade", name: "previous_qualification_grade", type: "text" },
-        { label: "Admission Grade", name: "admission_grade", type: "text" }
-      ]
+        { label: "Admission Grade", name: "admission_grade", type: "text" },
+      ],
     },
     {
       title: "Family Background",
       icon: Users,
       description: "Parent education and occupation",
       fields: [
-        { label: "Mother's Qualification", name: "mother_qualification_grouped", type: "select", options: [
-          { value: "0", label: "Basic Education" },
-          { value: "1", label: "Secondary Education" },
-          { value: "2", label: "Higher Education" }
-        ]},
-        { label: "Father's Qualification", name: "father_qualification_grouped", type: "select", options: [
-          { value: "0", label: "Basic Education" },
-          { value: "1", label: "Secondary Education" },
-          { value: "2", label: "Higher Education" }
-        ]},
-        { label: "Mother's Occupation", name: "mother_occupation_grouped", type: "select", options: [
-          { value: "Skilled", label: "Skilled" },
-          { value: "Unskilled", label: "Unskilled" },
-          { value: "Armed Forces", label: "Armed Forces" },
-          { value: "Student", label: "Student" },
-          { value: "Farmers", label: "Farmers" }
-        ]},
-        { label: "Father's Occupation", name: "father_occupation_grouped", type: "select", options: [
-          { value: "Skilled", label: "Skilled" },
-          { value: "Unskilled", label: "Unskilled" },
-          { value: "Armed Forces", label: "Armed Forces" },
-          { value: "Student", label: "Student" },
-          { value: "Farmers", label: "Farmers" }
-        ]}
-      ]
+        {
+          label: "Mother's Qualification",
+          name: "mother_qualification_grouped",
+          type: "select",
+          options: [
+            { value: "0", label: "Basic Education" },
+            { value: "1", label: "Secondary Education" },
+            { value: "2", label: "Higher Education" },
+          ],
+        },
+        {
+          label: "Father's Qualification",
+          name: "father_qualification_grouped",
+          type: "select",
+          options: [
+            { value: "0", label: "Basic Education" },
+            { value: "1", label: "Secondary Education" },
+            { value: "2", label: "Higher Education" },
+          ],
+        },
+        {
+          label: "Mother's Occupation",
+          name: "mother_occupation_grouped",
+          type: "select",
+          options: [
+            { value: "Skilled", label: "Skilled" },
+            { value: "Unskilled", label: "Unskilled" },
+            { value: "Armed Forces", label: "Armed Forces" },
+            { value: "Student", label: "Student" },
+            { value: "Farmers", label: "Farmers" },
+          ],
+        },
+        {
+          label: "Father's Occupation",
+          name: "father_occupation_grouped",
+          type: "select",
+          options: [
+            { value: "Skilled", label: "Skilled" },
+            { value: "Unskilled", label: "Unskilled" },
+            { value: "Armed Forces", label: "Armed Forces" },
+            { value: "Student", label: "Student" },
+            { value: "Farmers", label: "Farmers" },
+          ],
+        },
+      ],
     },
     {
       title: "Academic Performance",
@@ -238,23 +338,76 @@ const Predict: React.FC = () => {
         { label: "1st Sem Grade", name: "curricular_units_1st_sem_grade", type: "text" },
         { label: "2nd Sem Units Enrolled", name: "curricular_units_2nd_sem_enrolled", type: "text" },
         { label: "2nd Sem Units Approved", name: "curricular_units_2nd_sem_approved", type: "text" },
-        { label: "2nd Sem Grade", name: "curricular_units_2nd_sem_grade", type: "text" }
-      ]
-    }
+        { label: "2nd Sem Grade", name: "curricular_units_2nd_sem_grade", type: "text" },
+      ],
+    },
+    {
+      title: "Additional Information",
+      icon: Calculator,
+      description: "Financial and socioeconomic factors",
+      fields: [
+        {
+          label: "Daytime/Evening Attendance",
+          name: "daytime_evening_attendance",
+          type: "select",
+          options: [
+            { value: "0", label: "Evening" },
+            { value: "1", label: "Daytime" },
+          ],
+        },
+        {
+          label: "Tuition Fees Up to Date",
+          name: "tuition_fees_up_to_date",
+          type: "select",
+          options: [
+            { value: "0", label: "No" },
+            { value: "1", label: "Yes" },
+          ],
+        },
+        {
+          label: "Scholarship Holder",
+          name: "scholarship_holder",
+          type: "select",
+          options: [
+            { value: "0", label: "No" },
+            { value: "1", label: "Yes" },
+          ],
+        },
+        {
+          label: "Debtor",
+          name: "debtor",
+          type: "select",
+          options: [
+            { value: "0", label: "No" },
+            { value: "1", label: "Yes" },
+          ],
+        },
+        {
+          label: "Displaced",
+          name: "displaced",
+          type: "select",
+          options: [
+            { value: "0", label: "No" },
+            { value: "1", label: "Yes" },
+          ],
+        },
+        { label: "GDP", name: "gdp", type: "text" },
+      ],
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       {/* Hero Section with Parallax and Animated Gradient */}
       <div className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-200 via-green-100 to-green-300 
-          opacity-20 animate-gradient-bg z-0"></div>
-        <div className="absolute inset-0 bg-green-200 opacity-10 transform translate-y-20 
-          parallax-bg z-0"></div>
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-green-200 via-green-100 to-green-300 
+            opacity-20 animate-gradient-bg z-0"
+        ></div>
+        <div className="absolute inset-0 bg-green-200 opacity-10 transform translate-y-20 parallax-bg z-0"></div>
         <div className="z-10 text-center px-4 max-w-4xl">
           <AnimationWrapper direction="up">
-            <h1 className="text-5xl md:text-6xl font-bold text-green-800 mb-6 
-              drop-shadow-lg animate-pulse-slow">
+            <h1 className="text-5xl md:text-6xl font-bold text-green-800 mb-6 drop-shadow-lg animate-pulse-slow">
               Student Success Prediction
             </h1>
           </AnimationWrapper>
@@ -269,25 +422,30 @@ const Predict: React.FC = () => {
               className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 
                 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 
                 hover:shadow-xl flex items-center mx-auto relative overflow-hidden group"
+              aria-label="Start prediction"
             >
               <span className="relative z-10">Start Prediction</span>
               <ChevronDown className="ml-2 relative z-10" size={20} />
-              <div className="absolute inset-0 bg-green-500 opacity-0 group-hover:opacity-30 
-                transition-opacity duration-300"></div>
+              <div
+                className="absolute inset-0 bg-green-500 opacity-0 group-hover:opacity-30 
+                  transition-opacity duration-300"
+              ></div>
             </button>
           </AnimationWrapper>
         </div>
         <div className="absolute bottom-8 left-0 right-0 flex justify-center animate-bounce">
-          <ChevronDown className="text-green-600 drop-shadow-md" size={36} />
+          <ChevronDown className="text-green-600 drop-shadow-md" size={36} aria-hidden="true" />
         </div>
       </div>
 
       {/* About Section */}
       <section className="py-16 px-4 md:px-8 max-w-6xl mx-auto">
         <AnimationWrapper direction="left">
-          <h2 className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-4 
-            relative after:content-[''] after:w-20 after:h-1 after:bg-green-600 
-            after:absolute after:bottom-[-8px] after:left-1/2 after:-translate-x-1/2">
+          <h2
+            className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-4 
+              relative after:content-[''] after:w-20 after:h-1 after:bg-green-600 
+              after:absolute after:bottom-[-8px] after:left-1/2 after:-translate-x-1/2"
+          >
             How It Works
           </h2>
           <p className="text-lg text-green-700 text-center mb-12 max-w-3xl mx-auto">
@@ -324,9 +482,11 @@ const Predict: React.FC = () => {
       <section id="form-section" className="py-16 bg-green-50 relative">
         <div className="max-w-4xl mx-auto px-4 md:px-8">
           <AnimationWrapper direction="up">
-            <h2 className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-4 
-              relative after:content-[''] after:w-20 after:h-1 after:bg-green-600 
-              after:absolute after:bottom-[-8px] after:left-1/2 after:-translate-x-1/2">
+            <h2
+              className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-4 
+                relative after:content-[''] after:w-20 after:h-1 after:bg-green-600 
+                after:absolute after:bottom-[-8px] after:left-1/2 after:-translate-x-1/2"
+            >
               Enter Student Information
             </h2>
             <p className="text-lg text-green-700 text-center mb-12 max-w-3xl mx-auto">
@@ -345,7 +505,8 @@ const Predict: React.FC = () => {
                     setCurrentStep(index);
                   }}
                   className={`w-3 h-3 rounded-full transition-all duration-300 transform hover:scale-125 
-                    ${index === currentStep ? 'bg-green-600 w-8' : 'bg-green-300 hover:bg-green-400'}`}
+                    ${index === currentStep ? "bg-green-600 w-8" : "bg-green-300 hover:bg-green-400"}`}
+                  aria-label={`Go to step ${index + 1}`}
                 />
               ))}
             </div>
@@ -360,50 +521,46 @@ const Predict: React.FC = () => {
             <div className="flex items-center mb-6">
               {(() => {
                 const Icon = formSteps[currentStep].icon;
-                return <Icon className="text-green-600 mr-3 transform transition-transform duration-300 hover:scale-110" size={32} />;
+                return <Icon className="text-green-600 mr-3 transform transition-transform duration-300 hover:scale-110" size={32} aria-hidden="true" />;
               })()}
               <div>
-                <h3 className="text-2xl font-bold text-green-800">
-                  {formSteps[currentStep].title}
-                </h3>
-                <p className="text-green-600">
-                  {formSteps[currentStep].description}
-                </p>
+                <h3 className="text-2xl font-bold text-green-800">{formSteps[currentStep].title}</h3>
+                <p className="text-green-600">{formSteps[currentStep].description}</p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               {formSteps[currentStep].fields.map((field, index) => (
                 <div key={field.name} className="mb-4 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                  <label className="block text-sm font-medium text-green-700 mb-2">
-                    {field.label}
-                  </label>
+                  <label className="block text-sm font-medium text-green-700 mb-2">{field.label}</label>
                   {field.type === "select" ? (
-                    <select 
-                      name={field.name} 
-                      value={formData[field.name as keyof typeof formData] as string} 
+                    <select
+                      name={field.name}
+                      value={formData[field.name as keyof StudentData] || ""}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-green-200 rounded-lg bg-green-50 
                         focus:ring-2 focus:ring-green-400 focus:border-transparent 
                         transition-all duration-200 text-gray-700 focus:scale-[1.02] 
                         hover:border-green-300"
+                      aria-label={field.label}
                     >
-                      {field.options?.map((option: any) => (
+                      {field.options?.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
                       ))}
                     </select>
                   ) : (
-                    <input 
+                    <input
                       type="text"
-                      name={field.name} 
-                      value={formData[field.name as keyof typeof formData] as string} 
+                      name={field.name}
+                      value={formData[field.name as keyof StudentData] || ""}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-green-200 rounded-lg bg-green-50 
                         focus:ring-2 focus:ring-green-400 focus:border-transparent 
                         transition-all duration-200 text-gray-700 focus:scale-[1.02] 
                         hover:border-green-300"
+                      aria-label={field.label}
                     />
                   )}
                 </div>
@@ -418,10 +575,13 @@ const Predict: React.FC = () => {
                 className="px-6 py-2 border border-green-300 text-green-700 rounded-lg 
                   hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed 
                   transition-all duration-300 transform hover:scale-105 relative overflow-hidden group"
+                aria-label="Previous step"
               >
                 <span className="relative z-10">Previous</span>
-                <div className="absolute inset-0 bg-green-200 opacity-0 group-hover:opacity-20 
-                  transition-opacity duration-300"></div>
+                <div
+                  className="absolute inset-0 bg-green-200 opacity-0 group-hover:opacity-20 
+                    transition-opacity duration-300"
+                ></div>
               </button>
 
               {currentStep < formSteps.length - 1 ? (
@@ -429,10 +589,13 @@ const Predict: React.FC = () => {
                   onClick={handleNext}
                   className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 
                     transition-all duration-300 transform hover:scale-105 relative overflow-hidden group"
+                  aria-label="Next step"
                 >
                   <span className="relative z-10">Next</span>
-                  <div className="absolute inset-0 bg-green-500 opacity-0 group-hover:opacity-30 
-                    transition-opacity duration-300"></div>
+                  <div
+                    className="absolute inset-0 bg-green-500 opacity-0 group-hover:opacity-30 
+                      transition-opacity duration-300"
+                  ></div>
                 </button>
               ) : (
                 <button
@@ -443,24 +606,35 @@ const Predict: React.FC = () => {
                     focus:ring-4 focus:ring-green-300 transition-all duration-300 
                     transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed 
                     disabled:transform-none shadow-lg relative overflow-hidden group"
+                  aria-label="Generate prediction"
                 >
-                  <div className="absolute inset-0 bg-green-500 opacity-0 group-hover:opacity-20 
-                    transition-opacity duration-300"></div>
+                  <div
+                    className="absolute inset-0 bg-green-500 opacity-0 group-hover:opacity-20 
+                      transition-opacity duration-300"
+                  ></div>
                   {isSubmitting ? (
                     <div className="flex items-center relative z-10">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" 
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" 
-                          stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" 
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Processing...
                     </div>
                   ) : (
                     <div className="flex items-center relative z-10">
-                      <Calculator className="w-5 h-5 mr-2 transform transition-transform 
-                        duration-300 group-hover:scale-110" />
+                      <Calculator
+                        className="w-5 h-5 mr-2 transform transition-transform duration-300 group-hover:scale-110"
+                        aria-hidden="true"
+                      />
                       Generate Prediction
                     </div>
                   )}
@@ -531,5 +705,10 @@ const styles = `
     transition: transform 0.3s ease-out;
   }
 `;
+
+// Inject styles into the document
+const styleSheet = document.createElement("style");
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
 
 export default Predict;

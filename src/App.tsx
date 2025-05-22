@@ -12,6 +12,7 @@ import OurTeam from './pages/OurTeam';
 const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [prefilledData, setPrefilledData] = useState(null);
 
   // Kiểm tra kích thước màn hình
   useEffect(() => {
@@ -53,6 +54,11 @@ const App: React.FC = () => {
     if (isMobile) {
       setIsSidebarOpen(false);
     }
+  };
+
+  // Hàm xử lý khi sử dụng sample data
+  const handleUseSample = (studentData: any) => {
+    setPrefilledData(studentData);
   };
 
   return (
@@ -124,9 +130,9 @@ const App: React.FC = () => {
             <div className="max-w-7xl mx-auto">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/predict" element={<Predict />} />
+                <Route path="/predict" element={<Predict prefilledData={prefilledData} />} />
                 <Route path="/data" element={<Data />} />
-                <Route path="/example" element={<Example />} />
+                <Route path="/example" element={<Example onUseSample={handleUseSample} />} />
                 <Route path="/report" element={<Report />} />
                 <Route path="/our-team" element={<OurTeam />} />
               </Routes>
