@@ -3,7 +3,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  base: "/DropoutDetection",
   optimizeDeps: {
-    include: ['pdfjs-dist/build/pdf.worker.min.mjs'], // 👈 giúp Vite xử lý worker đúng cách
+    include: ['pdfjs-dist/build/pdf.worker.min.mjs'],
+
   },
 });
