@@ -18,7 +18,10 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci  # Sử dụng npm ci để cài đặt sạch và nhanh
+
+    - name: Fix Vite Permissions
+      run: chmod +x ./node_modules/.bin/vite  # Sửa quyền thực thi cho vite
 
     - name: Build project
       run: npm run build
