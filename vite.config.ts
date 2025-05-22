@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// Cấu hình Vite
 export default defineConfig({
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
+  optimizeDeps: {
+    include: ['pdfjs-dist/build/pdf.worker.min.mjs'], // 👈 giúp Vite xử lý worker đúng cách
+  },
 });
