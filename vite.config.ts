@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: "/DropoutDetection",
+  base: "/DropoutDetection/",
   optimizeDeps: {
     include: ['pdfjs-dist/build/pdf.worker.min.mjs'],
 
