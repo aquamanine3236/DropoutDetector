@@ -4,6 +4,9 @@ export const datasetStats = [
   { name: "Total Records", value: "76,518" },
   { name: "Features", value: "36" },
   { name: "Target Classes", value: "3" },
+  { name: "Missing Data", value: "0.0024%" },
+  { name: "Class Balance", value: "Moderate" },
+  { name: "Preprocessing Steps", value: "5" },
 ];
 
 export const impactData = [
@@ -12,6 +15,12 @@ export const impactData = [
   { name: "Average Debt with No Degree", value: "$13,500", source: "Federal Reserve" },
   { name: "Years of Potential Income Lost", value: "2-4", source: "BLS Analysis" },
 ];
+const classDistribution = [
+  { name: "Graduated", value: "47%", description: "Students who successfully completed their studies" },
+  { name: "Dropped Out", value: "33%", description: "Students who left before completion" },
+  { name: "Enrolled", value: "20%", description: "Students currently continuing studies" },
+];
+
 
 export const dropoutData = [
   { year: "2018", rate: 24.5, source: "NCES" },

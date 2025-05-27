@@ -49,7 +49,7 @@ const Data: React.FC = () => {
           </AnimationWrapper>
           <AnimationWrapper direction="up" delay={0.2}>
             <p className="text-xl md:text-2xl text-green-700 mb-8">
-              A cleaned dataset for predicting student dropout and academic success, sourced from Kaggle's Playground Series S4E6.
+              A cleaned dataset for predicting student dropout and academic success, sourced from Kaggle
             </p>
           </AnimationWrapper>
           <AnimationWrapper direction="up" delay={0.1}>
@@ -76,9 +76,6 @@ const Data: React.FC = () => {
           <p className="text-lg text-green-700 text-center mb-6 max-w-3xl mx-auto">
             The Academic Success Dataset is a cleaned version of data generated from a deep learning model trained on the original "Predict Students' Dropout and Academic Success" dataset.
           </p>
-          <p className="text-sm text-green-600 text-center mb-12 max-w-3xl mx-auto italic">
-            Source: <a href="https://www.kaggle.com/competitions/playground-series-s4e6/data" className="underline hover:text-green-800">Kaggle Playground Series S4E6</a>
-          </p>
         </AnimationWrapper>
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -91,9 +88,6 @@ const Data: React.FC = () => {
               <p className="text-green-700">
                 Generated from a deep learning model, with feature distributions similar to the original dataset.
               </p>
-              <p className="text-xs text-green-500 mt-2 italic">
-                Source: Kaggle Competition Description
-              </p>
             </div>
           </AnimationWrapper>
           <AnimationWrapper direction="right" delay={0.1}>
@@ -104,9 +98,6 @@ const Data: React.FC = () => {
               </h3>
               <p className="text-green-700">
                 Enables prediction of student outcomes and analysis of factors influencing academic success.
-              </p>
-              <p className="text-xs text-green-500 mt-2 italic">
-                Source: Kaggle Playground Series S4E6
               </p>
             </div>
           </AnimationWrapper>

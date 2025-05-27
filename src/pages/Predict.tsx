@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronDown, Brain, TrendingUp, Users, BookOpen, GraduationCap, Calculator } from "lucide-react";
+import { ChevronDown, Brain, TrendingUp, Users, BookOpen, GraduationCap, Calculator, CheckCircle, AlertCircle, Clock } from "lucide-react";
 
 interface StudentData {
   marital_status: string;
@@ -22,6 +22,7 @@ interface StudentData {
   curricular_units_1st_sem_enrolled: string;
   curricular_units_1st_sem_approved: string;
   curricular_units_1st_sem_grade: string;
+  curricular_units_1st_sem_evaluations: string;
   curricular_units_2nd_sem_enrolled: string;
   curricular_units_2nd_sem_evaluations: string;
   curricular_units_2nd_sem_approved: string;
@@ -33,6 +34,15 @@ interface StudentData {
 
 interface PredictProps {
   prefilledData: StudentData | null;
+}
+
+interface PredictionResult {
+  message: string;
+  probabilities: {
+    Dropout: number;
+    Enrolled: number;
+    Graduate: number;
+  };
 }
 
 const AnimationWrapper = ({
@@ -107,6 +117,8 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
+  const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<StudentData>({
     marital_status: "single",
@@ -115,9 +127,9 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
     daytime_evening_attendance: "0",
     tuition_fees_up_to_date: "1",
     scholarship_holder: "0",
-    previous_qualification_grouped: "1",
-    mother_qualification_grouped: "1",
-    father_qualification_grouped: "1",
+    previous_qualification_grouped: "Secondary Education",
+    mother_qualification_grouped: "Secondary Education",
+    father_qualification_grouped: "Secondary Education",
     mother_occupation_grouped: "Skilled",
     father_occupation_grouped: "Skilled",
     application_mode_grouped: "General Contingent",
@@ -129,6 +141,7 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
     curricular_units_1st_sem_enrolled: "6",
     curricular_units_1st_sem_approved: "0",
     curricular_units_1st_sem_grade: "",
+    curricular_units_1st_sem_evaluations: "0",
     curricular_units_2nd_sem_enrolled: "6",
     curricular_units_2nd_sem_evaluations: "0",
     curricular_units_2nd_sem_approved: "0",
@@ -142,7 +155,6 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
   useEffect(() => {
     if (prefilledData) {
       setFormData(prefilledData);
-      // Scroll to form section when data is prefilled
       const formSection = document.getElementById("form-section");
       if (formSection) {
         formSection.scrollIntoView({ behavior: "smooth" });
@@ -157,6 +169,16 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Scroll to results section when predictionResult changes
+  useEffect(() => {
+    if (predictionResult) {
+      const resultSection = document.getElementById("result-section");
+      if (resultSection) {
+        resultSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [predictionResult]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -174,14 +196,26 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
   };
 
   const handleSubmit = async () => {
+    console.log("Data being sent to backend:", JSON.stringify(formData, null, 2));
     setIsSubmitting(true);
+    setError(null);
+    setPredictionResult(null);
+
     try {
-      // Simulated API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      alert("Prediction completed successfully!");
-    } catch (error) {
+      const response = await fetch("http://127.0.0.1:8000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setPredictionResult(result);
+      } else {
+        throw new Error(result.detail || "Prediction failed");
+      }
+    } catch (error: any) {
       console.error("Error:", error);
-      alert("An error occurred during prediction.");
+      setError(error.message || "An error occurred during prediction.");
     } finally {
       setIsSubmitting(false);
     }
@@ -210,8 +244,6 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
           options: [
             { value: "single", label: "Single" },
             { value: "married_union", label: "Married/Union" },
-            { value: "divorced_sep", label: "Divorced/Separated" },
-            { value: "widower", label: "Widower" },
           ],
         },
         {
@@ -258,9 +290,7 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
           options: [
             { value: "General Contingent", label: "General Contingent" },
             { value: "Over 23", label: "Over 23" },
-            { value: "Transfer/Change", label: "Transfer/Change" },
-            { value: "Specialization", label: "Specialization" },
-            { value: "International", label: "International" },
+            { value: "Other", label: "Other" },
           ],
         },
         {
@@ -268,11 +298,12 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
           name: "previous_qualification_grouped",
           type: "select",
           options: [
-            { value: "0", label: "Basic Education" },
-            { value: "1", label: "Secondary Education" },
-            { value: "2", label: "Higher Education" },
+            { value: "Basic Education", label: "Basic Education" },
+            { value: "Secondary Education", label: "Secondary Education" },
+            { value: "Higher Education", label: "Higher Education" },
           ],
         },
+        { label: "Application Order", name: "application_order", type: "text" },
         { label: "Previous Qualification Grade", name: "previous_qualification_grade", type: "text" },
         { label: "Admission Grade", name: "admission_grade", type: "text" },
       ],
@@ -287,9 +318,9 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
           name: "mother_qualification_grouped",
           type: "select",
           options: [
-            { value: "0", label: "Basic Education" },
-            { value: "1", label: "Secondary Education" },
-            { value: "2", label: "Higher Education" },
+            { value: "Basic Education", label: "Basic Education" },
+            { value: "Secondary Education", label: "Secondary Education" },
+            { value: "Higher Education", label: "Higher Education" },
           ],
         },
         {
@@ -297,9 +328,9 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
           name: "father_qualification_grouped",
           type: "select",
           options: [
-            { value: "0", label: "Basic Education" },
-            { value: "1", label: "Secondary Education" },
-            { value: "2", label: "Higher Education" },
+            { value: "Basic Education", label: "Basic Education" },
+            { value: "Secondary Education", label: "Secondary Education" },
+            { value: "Higher Education", label: "Higher Education" },
           ],
         },
         {
@@ -336,7 +367,9 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
         { label: "1st Sem Units Enrolled", name: "curricular_units_1st_sem_enrolled", type: "text" },
         { label: "1st Sem Units Approved", name: "curricular_units_1st_sem_approved", type: "text" },
         { label: "1st Sem Grade", name: "curricular_units_1st_sem_grade", type: "text" },
+        { label: "1st Sem Evaluations", name: "curricular_units_1st_sem_evaluations", type: "text" },
         { label: "2nd Sem Units Enrolled", name: "curricular_units_2nd_sem_enrolled", type: "text" },
+        { label: "2nd Sem Evaluations", name: "curricular_units_2nd_sem_evaluations", type: "text" },
         { label: "2nd Sem Units Approved", name: "curricular_units_2nd_sem_approved", type: "text" },
         { label: "2nd Sem Grade", name: "curricular_units_2nd_sem_grade", type: "text" },
       ],
@@ -396,19 +429,32 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
     },
   ];
 
+  const getResultIcon = (label: string) => {
+    switch (label) {
+      case "Dropout":
+        return <AlertCircle className="text-red-500" size={24} />;
+      case "Enrolled":
+        return <Clock className="text-yellow-500" size={24} />;
+      case "Graduate":
+        return <CheckCircle className="text-green-500" size={24} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-      {/* Hero Section with Parallax and Animated Gradient */}
+      {/* Hero Section */}
       <div className="relative h-screen flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 bg-gradient-to-br from-green-200 via-green-100 to-green-300 
-            opacity-20 animate-gradient-bg z-0"
+            opacity-20 animate-gradient-bg"
         ></div>
-        <div className="absolute inset-0 bg-green-200 opacity-10 transform translate-y-20 parallax-bg z-0"></div>
+        <div className="absolute inset-0 bg-green-200 opacity-10 transform translate-y-20 parallax-bg"></div>
         <div className="z-10 text-center px-4 max-w-4xl">
           <AnimationWrapper direction="up">
             <h1 className="text-5xl md:text-6xl font-bold text-green-800 mb-6 drop-shadow-lg animate-pulse-slow">
-              Student Success Prediction
+              Student Prediction
             </h1>
           </AnimationWrapper>
           <AnimationWrapper direction="up" delay={0.2}>
@@ -494,7 +540,6 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
             </p>
           </AnimationWrapper>
 
-          {/* Step Navigation with Hover Effects */}
           <div className="flex justify-center mb-8">
             <div className="flex space-x-2">
               {formSteps.map((_, index) => (
@@ -512,7 +557,6 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
             </div>
           </div>
 
-          {/* Current Step with Slide Transition */}
           <div
             key={currentStep}
             className={`bg-white rounded-lg shadow-lg p-8 relative overflow-hidden will-change-transform
@@ -567,7 +611,6 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
               ))}
             </div>
 
-            {/* Navigation Buttons with Enhanced Effects */}
             <div className="flex justify-between mt-8">
               <button
                 onClick={handlePrevious}
@@ -644,71 +687,147 @@ const Predict: React.FC<PredictProps> = ({ prefilledData }) => {
           </div>
         </div>
       </section>
+
+      {/* Result Section */}
+      {(predictionResult || error) && (
+        <section id="result-section" className="py-16 bg-green-50">
+          <div className="max-w-4xl mx-auto px-4 md:px-8">
+            <AnimationWrapper direction="up">
+              <h2
+                className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-4 
+                  relative after:content-[''] after:w-20 after:h-1 after:bg-green-600 
+                  after:absolute after:bottom-[-8px] after:left-1/2 after:-translate-x-1/2"
+              >
+                Prediction Result
+              </h2>
+              <p className="text-lg text-green-700 text-center mb-12 max-w-3xl mx-auto">
+                {error ? "An error occurred while generating the prediction." : "Here is the predicted academic outcome based on the provided information."}
+              </p>
+            </AnimationWrapper>
+
+            {error ? (
+              <AnimationWrapper direction="up" delay={0.2}>
+                <div className="bg-red-50 rounded-lg shadow-lg p-6 text-center">
+                  <AlertCircle className="text-red-500 mx-auto mb-4" size={48} />
+                  <p className="text-red-700 text-lg font-semibold">{error}</p>
+                </div>
+              </AnimationWrapper>
+            ) : predictionResult ? (
+              <AnimationWrapper direction="up" delay={0.2}>
+                <div className="bg-white rounded-lg shadow-lg p-8 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-green-400 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                  <div className="flex items-center mb-6">
+                    <GraduationCap className="text-green-600 mr-3" size={32} />
+                    <h3 className="text-2xl font-bold text-green-800">{predictionResult.message}</h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-green-100">
+                          <th className="py-3 px-4 text-green-800 font-semibold border-b border-green-200">Outcome</th>
+                          <th className="py-3 px-4 text-green-800 font-semibold border-b border-green-200">Probability</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(predictionResult.probabilities).map(([label, probability], index) => (
+                          <tr
+                            key={label}
+                            className="hover:bg-green-50 transition-all duration-200"
+                            style={{ animationDelay: `${(index + 1) * 0.1}s` }}
+                          >
+                            <td className="py-3 px-4 border-b border-green-100 flex items-center">
+                              {getResultIcon(label)}
+                              <span className="ml-2 text-green-700 font-medium">{label}</span>
+                            </td>
+                            <td className="py-3 px-4 border-b border-green-100">
+                              <div className="relative pt-1">
+                                <div className="flex mb-2 items-center justify-between">
+                                  <div className="text-green-700">{(probability * 100).toFixed(2)}%</div>
+                                </div>
+                                <div className="flex h-2 bg-green-100 rounded">
+                                  <div
+                                    style={{ width: `${(probability * 100).toFixed(2)}%` }}
+                                    className={`bg-green-600 rounded transition-all duration-500 ${
+                                      label === "Dropout"
+                                        ? "bg-red-500"
+                                        : label === "Enrolled"
+                                        ? "bg-yellow-500"
+                                        : "bg-green-500"
+                                    }`}
+                                  ></div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </AnimationWrapper>
+            ) : null}
+          </div>
+        </section>
+      )}
+
+      <style>{`
+        @keyframes slide-left {
+          0% { transform: translateX(100%); opacity: 0; }
+          100% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slide-right {
+          0% { transform: translateX(-100%); opacity: 0; }
+          100% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-slide-left {
+          animation: slide-left 0.5s ease-out forwards;
+          will-change: transform, opacity;
+        }
+
+        .animate-slide-right {
+          animation: slide-right 0.5s ease-out forwards;
+          will-change: transform, opacity;
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out forwards;
+          will-change: transform, opacity;
+        }
+
+        @keyframes gradient-bg {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes pulse-slow {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.02); }
+          100% { transform: scale(1); }
+        }
+
+        .animate-gradient-bg {
+          background-size: 200% 200%;
+          animation: gradient-bg 15s ease infinite;
+        }
+
+        .animate-pulse-slow {
+          animation: pulse-slow 3s ease-in-out infinite;
+        }
+
+        .parallax-bg {
+          transition: transform 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 };
-
-// Add CSS for animations
-const styles = `
-  @keyframes slide-left {
-    0% { transform: translateX(100%); opacity: 0; }
-    100% { transform: translateX(0); opacity: 1; }
-  }
-
-  @keyframes slide-right {
-    0% { transform: translateX(-100%); opacity: 0; }
-    100% { transform: translateX(0); opacity: 1; }
-  }
-
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .animate-slide-left {
-    animation: slide-left 0.5s ease-out forwards;
-    will-change: transform, opacity;
-  }
-
-  .animate-slide-right {
-    animation: slide-right 0.5s ease-out forwards;
-    will-change: transform, opacity;
-  }
-
-  .animate-fade-in {
-    animation: fade-in 0.5s ease-out forwards;
-    will-change: transform, opacity;
-  }
-
-  @keyframes gradient-bg {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  
-  @keyframes pulse-slow {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
-  }
-
-  .animate-gradient-bg {
-    background-size: 200% 200%;
-    animation: gradient-bg 15s ease infinite;
-  }
-
-  .animate-pulse-slow {
-    animation: pulse-slow 3s ease-in-out infinite;
-  }
-
-  .parallax-bg {
-    transition: transform 0.3s ease-out;
-  }
-`;
-
-// Inject styles into the document
-const styleSheet = document.createElement("style");
-styleSheet.innerText = styles;
-document.head.appendChild(styleSheet);
 
 export default Predict;
